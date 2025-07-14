@@ -1,0 +1,39 @@
+public class GetFakeStoreProducts implements Queueable, Database.AllowsCallouts {
+    public void execute(QueueableContext context) {
+        System.debug('**** Queueable execute started ****');
+        
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint('https://fakestoreapi.com/products');
+        req.setMethod('GET');
+        req.setHeader('Content-Type', 'application/json');
+        
+        Http http = new Http();
+        HttpResponse res;
+        
+        try {
+            res = http.send(req);
+            System.debug('Status Code: ' + res.getStatusCode());
+            System.debug('Response Body: ' + res.getBody());
+            
+            if (res.getStatusCode() == 200) {
+                List<FakeStoreProduct> products =
+                    (List<FakeStoreProduct>) JSON.deserialize(res.getBody(), List<FakeStoreProduct>.class);
+                
+                 System.debug('Number of Products: ' + products.size());
+                
+                for (FakeStoreProduct p : products) {
+                    System.debug('Product → ' + p.title +
+                        ', Price → ' + p.price +
+                        ', Category → ' + p.category);
+                }
+            } else {
+                System.debug(' Callout failed. Status: ' + res.getStatusCode());
+            }
+        } catch (Exception e) {
+            System.debug(' Error during callout: ' + e.getMessage());
+        }
+        
+        System.debug('Queueable execute finished');
+    }
+}
+

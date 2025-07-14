@@ -1,0 +1,8 @@
+public class FakeStoreProduct {
+    public Integer id;
+    public String title;
+    public Decimal price;
+    public String description;
+    public String category;
+    public String image;
+}
